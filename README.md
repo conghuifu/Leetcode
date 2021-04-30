@@ -1,2 +1,2 @@
 # Leetcode
-leetcode summaries
+This repository is used for recording my leetcode progress.
