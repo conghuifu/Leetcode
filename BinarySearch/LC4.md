@@ -1,15 +1,15 @@
 #### Solution 1 sorting
-sort nums1 + nums2, then get medium \r
-complexity: O((n+m)log(n+m)) \r
+sort nums1 + nums2, then get medium <br />
+complexity: O((n+m)log(n+m)) <br />
 Space: (n+m)
 
 
 #### Solution 2 two pointer
-define x and y, if nums1[x] < nums[y]: newlist.append(nums1[x]); x += 1; \r
-else: newlist.append(nums2[y]); y += 1; \r
-stop looping while x or y touches boundary \r
-then return the medium in newlist \r
-complexity: O(m+n) \r
+define x and y, if nums1[x] < nums[y]: newlist.append(nums1[x]); x += 1; <br />
+else: newlist.append(nums2[y]); y += 1; <br />
+stop looping while x or y touches boundary <br />
+then return the medium in newlist <br />
+complexity: O(m+n) <br />
 Space: (n+m)
 
 ```
@@ -43,16 +43,16 @@ class Solution:
 
 
 #### Solution 3 binary search
-because the medium number is fixed, that means if we know the where to split on nums1, the split point on nums2 is fixed. That means we just need to know where to split on nums1 (shorter list). \r
-The question comes to how to decide whether the split point number is medium. we can know that the numbers at the split left side should smaller than the split point on right right for both two lists <=> maxleft <= minright \r
-if xleft > yright: split is too large, need to smaller the split => right = x - 1. elif xright < yleft: split is too small, needs to larger the split => left = x + 1. \r
+because the medium number is fixed, that means if we know the where to split on nums1, the split point on nums2 is fixed. That means we just need to know where to split on nums1 (shorter list). <br />
+The question comes to how to decide whether the split point number is medium. we can know that the numbers at the split left side should smaller than the split point on right right for both two lists <=> maxleft <= minright <br />
+if xleft > yright: split is too large, need to smaller the split => right = x - 1. elif xright < yleft: split is too small, needs to larger the split => left = x + 1. <br />
 ######important points:
-1. x and y here means the number in each list. so the split point should be x-1 nad y - 1 \r
-2. why we use left <= right and right = mid - 1, left = mid + 1; instead of left < right and right = mid, the reason is that the later one would judge on the border point, when it touches the border, it will end the loop. While in this question, we need to compare the xright with yleft and xleft with yright. \r
-the first model output: left == right, and wont compare the border \r
-the later model output: left != right, but will go with the border \r
+1. x and y here means the number in each list. so the split point should be x-1 nad y - 1 <br />
+2. why we use left <= right and right = mid - 1, left = mid + 1; instead of left < right and right = mid, the reason is that the later one would judge on the border point, when it touches the border, it will end the loop. While in this question, we need to compare the xright with yleft and xleft with yright. <br />
+the first model output: left == right, and wont compare the border <br />
+the later model output: left != right, but will go with the border <br />
 
-complexity: O(logmin{m, n}) \r
+complexity: O(logmin{m, n}) <br />
 space: O(1)
 ```
 import sys
