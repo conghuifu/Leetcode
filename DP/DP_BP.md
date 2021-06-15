@@ -147,5 +147,47 @@ class Solution:
 ```
 7. minumum falling path sum II
 ```
-和6一毛一样
+# 931 minumum falling path sum I
+class Solution:
+    def minFallingPathSum(self, matrix: List[List[int]]) -> int:
+        n = len(matrix)
+        if n == 0: return 0
+        if n == 1: return min(matrix[0])
+        m = len(matrix[0])
+        
+        direcs = [1, 0, -1]
+        dp = matrix[0]
+        for i in range(1, n):
+            dp_tmp = dp.copy()
+            for j in range(m):
+                local_min = sys.maxsize
+                for direc in direcs:
+                    if (j + direc >= 0) and (j + direc < m):
+                        local_min = min(local_min, dp_tmp[j+direc])
+                dp[j] = local_min + matrix[i][j]
+        return min(dp)
 ```
+```
+# 1289 minumum falling path sum II
+class Solution:
+    def minFallingPathSum(self, arr: List[List[int]]) -> int:
+        n = len(arr)
+        if n == 0: return 0
+        if n == 1: return min(arr[0])
+        m = len(arr[0])
+        
+        dp = arr[0]
+        for i in range(1, n):
+            dp_tmp = dp.copy()
+            for j in range(m):
+                local_min = sys.maxsize
+                for z in range(m):
+                    if z != j:
+                        local_min = min(local_min, dp_tmp[z])
+                dp[j] = local_min + arr[i][j]
+        return min(dp)
+```
+8. LC487 <br />
+···
+未/行使过权利两种状态
+···
