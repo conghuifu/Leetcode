@@ -19,6 +19,7 @@ b2. 大问题的最优解可以由若干个小问题的最优解推出 <br />
 2. 定义dp[i][j] 和d[i - 1][j]的关系 <br />
 3. 最终结果是dp[last][j]中的某种aggregation <br />
 根据图表关系画一画，状态转移之间的关系
+
 ###### 例题
 1. LC 198
 ```
@@ -188,6 +189,193 @@ class Solution:
         return min(dp)
 ```
 8. LC487 <br />
-···
-未/行使过权利两种状态
-···
+```
+# 未/行使过权利两种状态
+class Solution:
+    def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n <= 1: return n
+        
+        # p：未行权， q: 行权
+        p = nums[0]
+        q = 1
+        
+        res = max(p, q)
+
+        for i in range(1, n):
+            p_tmp, q_tmp = p, q
+            p = (p_tmp + 1) * nums[i]
+            q = max((q_tmp + 1) * nums[i], p_tmp + 1)
+            res = max(p, q, res)
+        return res
+```
+
+##### II类基本型 - “时间序列”加强型
+给一个序列，其中每个元素可以认为是‘一天’，但今天的状态是和之前的某一天有关，需要挑选 <br />
+套路： <br />
+1. dp[i]:表示ith状态，一半这个状态要求和元素i有直接关系 <br />
+2. 关联dp[i]和dp[i'] （但是肯定不能和大于i的状态有关系）<br />
+3. 最终结果是dp[i]中的某一个
+
+###### 例题
+1. LC300
+```
+# 两个for 循环
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n == 0: return 0
+        
+        dp = [1 for i in range(n)]
+        for i in range(1, n):
+            for j in range(i):
+                if nums[i] > nums[j]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+        
+        return max(dp)
+```
+2. 368 <br />
+这题需要打印其中一条path，所以需要两个dp数组，count存数量，dp存上一个index。index起始应该是一个distinguished value，以便结尾再回溯的时候有终止条件。然后res从count最大index开始粘，while maxIndex != -1: res.append(nums[maxIndex]), maxIndex = dp[maxIndex]
+```
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        if n <= 1: return nums
+        
+        nums.sort()
+        dp = [-1 for i in range(n)]
+        count = [1 for i in range(n)]
+        for i in range(1, n):
+            for j in range(i):
+                if nums[i] % nums[j] == 0:
+                    if count[j] + 1 >= count[i]:
+                        count[i] = count[j] + 1
+                        dp[i] = j
+        maxIndex = count.index(max(count))
+        res = []
+        while maxIndex != -1:
+            res.append(nums[maxIndex])
+            maxIndex = dp[maxIndex]
+        return res
+```
+3. 1186 <br />
+这题巧妙之处在于，dp每个元素，存的是到i时的total height
+```
+class Solution:
+    def maximumSum(self, arr: List[int]) -> int:
+        n = len(arr)
+        if n == 0: return 0
+        if n == 1: return arr[0]
+        
+        # p: havent deleted, q: deleted
+        p, q = arr[0], 0
+        res = p
+        for i in range(1, n):
+            p_tmp, q_tmp = p, q
+            p = max(0, p_tmp) + arr[i]
+            q = max(q_tmp + arr[i], p_tmp, arr[i])
+            res = max(res, p, q)
+        return res
+```
+
+##### III双时间序列型
+给两个序列s和t，让你对他们搞事情 <br />
+longtest common subsequence, shortest common sequence, edit distances <br />
+套路： <br />
+1. 定义dp[i][j]: 表示针对s[1:i]和t[1:j]的子问题的求解（基本问啥设啥，加一个定语） <br />
+2. 千方百计将dp[i][j]往之前的状态去转移：dp[i-1][j], dp[i][j-1]和dp[i-1][j-1] <br />
+3. 最终结果是dp[m][n] <br />
+
+###### 例题
+1. 1143 <br />
+看两个序列是否match，建立dp[i][j]表示s[i]和t[j]之间的关系。如果满足则dp[i-1][j-1] + val，否则引用dp[i-1][j]或者dp[i][j-1]的值。这里一个trick，比较两遍string大小，dp设m+1, n+1 dims，这样第一位为空，则都是0，不用考虑边界问题。就是记得for looping循环locate原array要减1
+```
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        m = len(text1)
+        n = len(text2)
+        
+        if (m == 0) or (n == 0): return 0
+        
+        dp = [[0 for i in range(n+1)] for j in range(m+1)]
+        
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if text1[i-1] == text2[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+                else:
+                    dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+        
+        return dp[-1][-1]
+```
+2. LC1092 <br />
+这道题就是要多打一个path，回溯dp[i][j]的值是从哪里来的就好了
+```
+class Solution:
+    def shortestCommonSupersequence(self, str1: str, str2: str) -> str:
+        m = len(str1)
+        n = len(str2)
+        
+        if m == 0: return str2
+        if n == 0: return str1
+        
+        dp = [[0 for j in range(n+1)] for i in range(m+1)]
+        for i in range(1, m+1):
+            dp[i][0] = i
+        for j in range(1, n+1):
+            dp[0][j] = j
+            
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if str1[i-1] == str2[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+                else:
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + 1
+        
+        # then trace back the routh
+        i, j = m, n
+        res = ''
+        while (i > 0) and (j > 0):
+            if str1[i-1] == str2[j-1]:
+                res = str1[i-1] + res
+                i -= 1
+                j -= 1
+            else:
+                if dp[i][j] == dp[i-1][j] + 1:
+                    res = str1[i-1] + res
+                    i -= 1
+                else:
+                    res = str2[j-1] + res
+                    j -= 1
+        if i > 0:
+            res = str1[:i] + res
+        if j > 0:
+            res = str2[:j] + res
+        
+        return res
+```
+3. LC72 
+```
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        m = len(word1)
+        n = len(word2)
+        
+        if m == 0: return n
+        if n == 0: return m
+        
+        dp = [[0 for j in range(n+1)] for i in range(m+1)]
+        for i in range(1, m+1):
+            dp[i][0] = i
+        for j in range(1, n+1):
+            dp[0][j] = j
+            
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if word1[i-1] == word2[j-1]:
+                    dp[i][j] = dp[i-1][j-1]
+                else:
+                    dp[i][j] = min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]) + 1
+                    
+        return dp[-1][-1]
+```
