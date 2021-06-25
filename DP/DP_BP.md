@@ -379,3 +379,35 @@ class Solution:
                     
         return dp[-1][-1]
 ```
+4. LC97 <br />
+这题要小心，把0，0的边界指标写进loop，因为可以不选，不能从1，1开始啦
+```
+class Solution:
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        m = len(s1)
+        n = len(s2)
+        
+        if m == 0: return s2 == s3
+        if n == 0: return s1 == s3
+        if m + n != len(s3): return False
+        
+        dp = [[0 for j in range(n+1)] for i in range(m+1)]
+        dp[0][0] = 1
+        
+        for i in range(m+1):
+            for j in range(n+1):
+                if (i == 0) and (j == 0):
+                    dp[0][0] = 1
+                elif j == 0:
+                    if dp[i-1][j] == 1:
+                        dp[i][j] = int(s1[i-1] == s3[i-1])
+                elif i == 0:
+                    if dp[i][j-1] == 1:
+                        dp[i][j] = int(s2[j-1] == s3[j-1])
+                else:
+                    if (s1[i-1] == s3[i+j-1]) and (dp[i-1][j] == 1):
+                        dp[i][j] = 1
+                    elif (s2[j-1] == s3[i+j-1]) and (dp[i][j-1] == 1):
+                        dp[i][j] = 1
+        return dp[-1][-1] == 1
+```
