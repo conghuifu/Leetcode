@@ -411,3 +411,134 @@ class Solution:
                         dp[i][j] = 1
         return dp[-1][-1] == 1
 ```
+
+##### IV：第I类区间型DP
+给出一个序列，明确要求分割成K个连续区间，要你计算这些区间的某个最优性质。一般看到让分成k个子串，就是区间型的DP <br />
+套路：<br />
+1. 状态定义: dp[i][k]表示针对s[i:]分成k个区间，此时能够得到的最优解 <br />
+2. 搜寻最后一个区间的起始位置j，将dp[i][k]分割成dp[j-1][k-1]和s[j:i]两部分 <br />
+3. 最终结果是dp[N][K] <br />
+find the best j: <br />
+xxxxxxxxxxxx | jxxxxi <br />
+dp[j-1][k-1]   s[j:i] <br />
+```
+###
+状态的转移：
+1. 第一层循环遍历i
+2. 第二层循环遍历k
+3. 第三层循环寻找最优的位置j作为一个分区的起始位置
+4. 将dp[i][k]分成dp[j-1][k-1]和s[j:i]求解
+###
+
+for i in range(1, n+1):
+	# K不能太大，否则不够i个元素分
+	for k in range(1, min(i, K)):
+		# j不能太小，否则不够分成k-1组
+		for j in range(i, k-1, -1):
+			dp[j-1][j-1] + count[j][i]
+Ans = dp[N][K]
+
+# 注意边界条件: dp[x][0], dp[0][0]
+```
+
+###### 例题
+1. LC1278 <br />
+一般不知道怎么定义dp就直接照抄题目啦～  <br />
+dp[i][k]: the minimal number of characters that you need to change to divide the string s[0:i] into k (k is different from K) substrings that they are all palindromes. <br />
+[XXXXXX][j XX i] <br />
+1. 算[j XX i]的操作: helper(s[j:i]) <br />
+2. 算s[:j-1]分成k-1份的最小操作数: dp[i-1][k-1]<br />
+3. dp[i][k] = min{dp[j-1][k-1] + helper(s[j:i])} for j=1,....,i
+
+```
+class Solution:
+    def palindromePartition(self, s: str, k: int) -> int:
+        m = len(s)
+        
+        dp = [[m+1 for j in range(k+1)] for i in range(m+1)]
+        dp[0][0] = 0
+        
+        for i in range(1, m+1):
+            for K in range(1, min(i, k)+1):
+                for j in range(K, i+1):
+                    dp[i][K] = min(dp[i][K], dp[j-1][K-1] + self.helper(s, j, i))   
+        return dp[-1][-1]
+    
+    def helper(self, s, i, j):
+        ct = 0
+        while i < j:
+            if s[i-1] != s[j-1]:
+                ct += 1
+            i += 1
+            j -= 1
+            
+        return ct
+```
+这里运行时间久，主要是每次都要重复调用helper函数计算次数，这可以预先算好存起来，这个也是dp的一种。之后再说
+2. LC1335
+3. LC410
+
+##### V：第II类区间型DP
+只给出一个序列S（数组/字符串），求一个针对这个序列的最优解<br />
+适用条件：这个最优解对于序列的index而言，没有“后效性”。即无法设计dp[i]，使得dp[i]仅依赖于dp[j](j<i)。但是最大区间的最优解，可以依赖小区间的最优解<br />
+套路：<br />
+1. 定义dp[i][j]：表示针对s[i:j]的子问题求解<br />
+2. 千方百计将区间dp[i][j]往小区间的dp[i'][j']转移（第一层循环时区间大小，第二层循环是起始点）<br />
+3. 最终的结果是dp[1][N]
+
+###### 例题
+1. LC516 <br />
+2. LC312 <br />
+3. LC375 <br />
+4. LC1246
+
+##### VI：第I类+第II类区间型DP Boss题
+第I类是分成K个区间，第II类是小问题到大问题，你得先找到[i:j]分成k堆的最优解，再找到全局的最优解。所以是dp[i][j][k].<br />
+iXXXXXXXXXXXXXXmXXXXXXXXXXj <br />
+dp[i][m-1][k-1] dp[m][j][1]
+套路: <br />
+```
+# dp[i][j][k]表示将区间[i:j]归并成k堆的最小代价
+for length in range(1, N+1):
+    for i in range(1, N-length+2):
+        j = i+lenngth-1
+        for k in range(2, K+1):
+            for m in range(i, j+1):
+                dp[i][j][k] = min(dp[i][j][k], dp[i][m-1][k-1] + dp[m][j][1])
+        dp[i][j][1] = dp[i][j][K] = sum[i:j]
+return dp[1][N][1]
+# 特别注意：当k=1时，dp[i][j][1]只能由dp[i][j][K]转化而来
+```
+LC 1000
+```
+class Solution:
+    def mergeStones(self, stones: List[int], k: int) -> int:
+        n = len(stones)
+        if (n-1)%(k-1) != 0: return -1 # 这个条件没有很懂
+        
+        dp = [[[sys.maxsize for K in range(k+1)] for j in range(n+1)] for i in range(n+1)]
+        for i in range(1, n+1):
+            dp[i][i][1] = 0
+        
+        summ = [0 for i in range(n+1)]
+        for i in range(1, n+1):
+            summ[i] = summ[i-1] + stones[i-1]
+        
+        
+        for length in range(2, n+1):
+            for i in range(1, n-length+2):
+                j = i+length-1
+                for K in range(1, k+1):
+                    # 优化1
+                    if K > length: continue
+                    for m in range(i, j):
+                        # 如果没有更新就说明不能分啦，所以continue
+                        if (dp[i][m][K-1] == sys.maxsize) or (dp[m+1][j][1] == sys.maxsize): continue
+                        dp[i][j][K] = min(dp[i][j][K], dp[i][m][K-1]+dp[m+1][j][1])
+                # 一样没有更新就不能分
+                if dp[i][j][k] != sys.maxsize:
+                    dp[i][j][1] = dp[i][j][k] + summ[j] - summ[i-1]
+        
+        if dp[1][n][1] == sys.maxsize: return -1
+        return dp[1][n][1]
+```
