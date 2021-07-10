@@ -441,7 +441,6 @@ Ans = dp[N][K]
 # 注意边界条件: dp[x][0], dp[0][0]
 ```
 
-###### 例题
 1. LC1278 <br />
 一般不知道怎么定义dp就直接照抄题目啦～  <br />
 dp[i][k]: the minimal number of characters that you need to change to divide the string s[0:i] into k (k is different from K) substrings that they are all palindromes. <br />
@@ -509,7 +508,9 @@ for length in range(1, N+1):
 return dp[1][N][1]
 # 特别注意：当k=1时，dp[i][j][1]只能由dp[i][j][K]转化而来
 ```
-LC 1000
+
+###### 例题
+1. LC 1000
 ```
 class Solution:
     def mergeStones(self, stones: List[int], k: int) -> int:
@@ -542,3 +543,29 @@ class Solution:
         if dp[1][n][1] == sys.maxsize: return -1
         return dp[1][n][1]
 ```
+##### VII：背包入门问题
+给出N个物品，每个物品可用可不用或者有若干个不同的用法（！！！！）要求以某个有上/下限的C的代价来实现最大收益。利用了物品的无后效性：在前四件物品中做选择的最大收益，和第五件物品没关系。其将各个物品是否使用的高维向量，替换成了代价的解空间。上限是C。<br />
+套路：<br />
+1. 定义dp[i][c]:表示考虑只从前i件物品的子集里选择代价为c的最大收益,c=1,2,...,C <br />
+2. 千方百计把dp[i][c]往dp[i-1][c']转移，即考虑如何使用物品i，对代价/收益的影响 <br />
+2a.第一层循环是物品编号<br />
+2b.第二层循环是所有可能的代价c' <br />
+
+3. 最终的结果是max(dp[N][c]) 1<=c<=N <br />
+这里要注意哦，最大值不一定在代价最大的地方招。注意这个套路是exactly代价为c的时候哦，不是不超过c
+```
+for i in range(1, N+1):
+    for c in range(1, C+1):
+        dp[i][c] = max(dp[i-1][c], dp[i-1][c-wi]+vi)
+Ans = maxc{dp[N][c]}
+# 注意边界条件: dp[0][0] = 0
+# dp[0][c] = NA (非法值，可以定义取不到的)
+
+```
+
+###### 例题
+1. LC 494 <br />
+这道题能想到dp主要因为：1. 给每个元素加正负号-》每个元素可加可不加-〉相当于用不用 2. 空间不是很大，target最多就是-sum~sum <br />
+2. LC1049 <br />
+3. LC474 <br />
+4. LC879 <br />
