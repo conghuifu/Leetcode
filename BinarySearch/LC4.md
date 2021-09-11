@@ -96,4 +96,96 @@ class Solution:
                 right = x - 1
             elif xright < yleft:
                 left = x + 1
-```        
+```
+
+3a. complexity: O(m+n), Space: O(1)
+```
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        m = len(nums1)
+        n = len(nums2)
+        
+        if (m + n) % 2 == 0:
+            flag = 2
+        else:
+            flag = 1
+        ct = 0
+        res = 0
+        k = (m + n)//2
+        i, j = 0, 0
+        
+        while (i < m) or (j < n):
+            val1 = nums1[i] if i < m else sys.maxsize
+            val2 = nums2[j] if j < n else sys.maxsize
+            
+            if val1 < val2:
+                val = val1
+                i += 1
+            else:
+                val = val2
+                j += 1
+            
+            ct += 1
+            if (ct == k) and (flag == 2):
+                res += val
+            if (ct == k+1):
+                res += val
+                break
+        
+        return res/flag
+```
+3b. <br />
+https://leetcode.com/problems/median-of-two-sorted-arrays/discuss/2481/Share-my-O(log(min(mn)))-solution-with-explanation <br />
+找到直接return。因为这题出来太不好判断，因此用另一个模板。
+```
+l, r = 0, len(A)
+while l <= r:
+    mid = l + (r - l)//2
+    cal = func(mid)
+    if cal == target:
+        return mid
+    elif cal > target:
+        r = mid
+    else:
+        l = mid 
+```
+Answer
+```
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        m, n = len(nums1), len(nums2)
+        if m > n:
+            return self.findMedianSortedArrays(nums2, nums1)
+        if (m + n) % 2 == 0:
+            flag = True
+        else:
+            flag = False
+        
+        l, r = 0, m
+        while l <= r:
+            x = l + (r - l)//2
+            y = (m + n + 1)//2 - x
+            
+            xleft = nums1[x-1] if x > 0 else -sys.maxsize
+            yleft = nums2[y-1] if y > 0 else -sys.maxsize
+            xright = nums1[x] if x < m else sys.maxsize
+            yright = nums2[y] if y < n else sys.maxsize
+            
+            if (xleft <= yright) and (yleft <= xright):
+                if flag:
+                    return (max(xleft, yleft) + min(xright, yright))/2
+                else:
+                    return max(xleft, yleft)
+            elif xleft > yright:
+                r = x - 1
+            else:
+                l = x + 1
+            
+# j = (m+n+1)//2 - i => m<=n     
+# j = (m + n + 1)//2 - i (keep left = right|right+1. name y and x as the index of right, and the index starts from 0, so if m+n == 3, x=0, y=2, leftlength=0+2, right=1+0,make sense)
+# 0 <= i < m
+# 0 <= j < n
+# a0, a1, a2 | a3, a4, a5
+# b0, b1, b2 | b3, b4
+
+```

@@ -193,3 +193,15 @@ def findLoc(A, target):
             l = mid + 1
     return ans
 ```
+
+### 终极套路
+```
+l, r = 0, len(A)-1
+while l + 1 < r:
+    mid = l + (r - l)//2
+    if func(mid) >= target:
+        r = mid
+    else:
+        l = mid
+decide l&r
+```
