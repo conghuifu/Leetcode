@@ -48,3 +48,77 @@ class Solution:
         else:
             return -1
 ```
+
+### bfs
+1. 
+```
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        m = len(grid)
+        if m == 0:
+            return -1
+        n = len(grid[0])
+        
+        queue = collections.deque()
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 2:
+                    queue.append((i, j))
+                    
+        direcs = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+        ct = -1
+        while queue:
+            size = len(queue)
+            ct += 1
+            for _ in range(size):
+                i, j = queue.popleft()
+                for direc in direcs:
+                    x = i + direc[0]
+                    y = j + direc[1]
+                    if (x >= 0) and (y >= 0) and (x < m) and (y < n) and (grid[x][y] == 1):
+                        grid[x][y] = 2
+                        queue.append((x, y))
+        
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    return -1
+        return max(ct, 0)
+```
+2.
+```
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        m = len(grid)
+        if m == 0:
+            return -1
+        n = len(grid[0])
+        fresh = 0
+        
+        queue = collections.deque()
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 2:
+                    queue.append((i, j))
+                elif grid[i][j] == 1:
+                    fresh += 1
+                    
+        direcs = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+        ct = 0
+        while queue and (fresh > 0):
+            size = len(queue)
+            ct += 1
+            for _ in range(size):
+                i, j = queue.popleft()
+                for direc in direcs:
+                    x = i + direc[0]
+                    y = j + direc[1]
+                    if (x >= 0) and (y >= 0) and (x < m) and (y < n) and (grid[x][y] == 1):
+                        grid[x][y] = 2
+                        queue.append((x, y))
+                        fresh -= 1
+        
+        if fresh > 0:
+            return -1
+        return max(ct, 0)
+```

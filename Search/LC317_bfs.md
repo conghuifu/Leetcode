@@ -43,3 +43,45 @@ class Solution:
         if len(position) == 0: return -1
         return min(position.values())
 ```
+
+### recap
+```
+class Solution:
+    def shortestDistance(self, grid: List[List[int]]) -> int:
+        m = len(grid)
+        n = len(grid[0])
+        direcs = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+        
+        buildings = []
+        pos = dict()
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    buildings.append((i, j))
+                elif grid[i][j] == 0:
+                    pos[(i, j)] = 0
+        
+        for build in buildings:
+            queue = collections.deque([(build[0], build[1])])
+            seen = set()
+            seen.add((build[0], build[1]))
+            ct = 0
+            while queue:
+                size = len(queue)
+                ct += 1
+                for _ in range(size):
+                    i, j = queue.popleft()
+                    for direc in direcs:
+                        x = i + direc[0]
+                        y = j + direc[1]
+                        if (x >= 0) and (y >= 0) and (x < m) and (y < n) and ((x, y) in pos) and ((x, y) not in seen):
+                            queue.append((x, y))
+                            seen.add((x, y))
+                            pos[(x, y)] += ct
+            
+            rem = set(pos.keys()) - seen
+            for key in rem:
+                pos.pop(key)
+        
+        return min(pos.values()) if len(pos)>0 else -1
+```

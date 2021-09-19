@@ -35,3 +35,42 @@ class Solution:
                         seen.add((x, y))
             return seen    
 ```
+
+### recap
+```
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        self.m = len(heights)
+        self.n = len(heights[0])
+        atl_queue = collections.deque()
+        pac_queue = collections.deque()
+        for i in range(self.m):
+            pac_queue.append((i, 0))
+            atl_queue.append((i, self.n-1))
+        for j in range(self.n):
+            pac_queue.append((0, j))
+            atl_queue.append((self.m-1, j))
+
+        atl = self.bfs(heights, atl_queue)
+        pac = self.bfs(heights, pac_queue)
+
+        return list(atl.intersection(pac))
+    
+    def bfs(self, heights, queue):
+        direcs = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+        seen = set()
+        
+        for i, j in queue:
+            seen.add((i, j))
+        
+        while queue:
+            i, j = queue.popleft()
+            for direc in direcs:
+                x = i + direc[0] 
+                y = j + direc[1]
+                if (x >= 0) and (y >= 0) and (x < self.m) and (y < self.n) and ((x, y) not in seen) and (heights[x][y] >= heights[i][j]):
+                    seen.add((x, y))
+                    queue.append((x, y))
+        return seen
+            
+```

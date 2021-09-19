@@ -40,3 +40,34 @@ class Solution:
                             queue.append(newWord)
         return 0
 ```
+
+### recap
+```
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        queue = collections.deque([beginWord])
+        wordList = set(wordList)
+        ct = 1
+        replace = 'abcdefghijklmnopqrstuvwxyz'
+        visited = set()
+        visited.add(beginWord)
+        
+        while queue:
+            ct += 1
+            size = len(queue)
+            for _ in range(size):
+                cur = queue.popleft()
+                for i in range(len(cur)):
+                    for j in replace:
+                        new = cur[:i] + j + cur[i+1:]
+                        if (new in wordList) and (new not in visited):
+                            if new == endWord:
+                                return ct
+                            queue.append(new)
+                            visited.add(new)
+        return 0
+        
+# hit => cog
+# "hot","dot","dog","lot","log","cog"
+
+```

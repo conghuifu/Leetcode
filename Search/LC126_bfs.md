@@ -56,3 +56,33 @@ class Solution:
         dfs(endWord, [endWord], step)
         return ans
 ```
+
+
+### recapping
+```
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[str]]:
+        res = []
+        replace = 'abcdefghijklmnopqrtsuvwxyz'
+        queue = collections.deque([(beginWord, [beginWord])])
+        wordList = set(wordList)
+        visited = set()
+        ct = 1
+        
+        while queue:
+            size = len(queue)
+            ct += 1
+            tmp = set()
+            for _ in range(size):
+                cur, curlist = queue.popleft()
+                for i in range(len(cur)):
+                    for j in replace:
+                        new = cur[:i] + j + cur[i+1:]
+                        if (new in wordList) and (new not in visited):
+                            if new == endWord:
+                                res.append(curlist + [new])
+                            tmp.add(new)
+                            queue.append((new, curlist + [new]))
+            visited = visited.union(tmp)
+        return res
+```
