@@ -31,3 +31,38 @@ class Solution:
             cur.next = ListNode(pre)
         return head.next
 ```
+
+
+### recap
+```
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        i = l1
+        j = l2
+        carry = 0
+        
+        dummy = ListNode(0)
+        cur = dummy
+        while i or j:
+            val1 = i.val if i else 0
+            val2 = j.val if j else 0
+            
+            cur.next = ListNode((val1+val2+carry) % 10)
+            carry = (val1+val2+carry) // 10
+            
+            cur = cur.next
+            if i:
+                i = i.next
+            if j:
+                j = j.next
+                
+        if carry > 0:
+            cur.next = ListNode(carry)
+            
+        return dummy.next
+```
